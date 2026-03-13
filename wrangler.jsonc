@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "midwifeai-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-12",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "vars": {
+    "ALLOWED_BUNDLE_ID": "com.midwifeai.app",
+    "PREMIUM_PRODUCT_ID": "com.midwifeai.premium.monthly"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMIT",
+      "id": "PLACEHOLDER_KV_ID"
+    }
+  ]
+  // Secrets (set via `wrangler secret put`):
+  //   OPENAI_API_KEY
+}
