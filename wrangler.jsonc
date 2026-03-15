@@ -13,7 +13,8 @@
   "kv_namespaces": [
     {
       "binding": "RATE_LIMIT",
-      "id": "PLACEHOLDER_KV_ID"
+      "id": "7ee2857bf7404e258f5d1c7a956409c7",
+      "preview_id": "a689b76a88064c39a54057febfdb16fd"
     }
   ]
   // Secrets (set via `wrangler secret put`):
