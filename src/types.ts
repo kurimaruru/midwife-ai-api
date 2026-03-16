@@ -73,6 +73,7 @@ export type ChatRequest = {
   message: string;
   previousResponseId?: string;
   activityLogs: ActivityLog[];
+  stream?: boolean;
 };
 
 // --- Response Types ---

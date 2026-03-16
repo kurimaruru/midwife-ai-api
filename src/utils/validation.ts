@@ -55,4 +55,5 @@ export const chatRequestSchema = z.object({
     .regex(/^resp_/, 'previousResponseIdは resp_ で始まる必要があります')
     .optional(),
   activityLogs: z.array(activityLogSchema).max(200),
+  stream: z.boolean().optional(),
 });

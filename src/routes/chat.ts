@@ -4,7 +4,7 @@ import { chatRequestSchema } from '../utils/validation';
 import { AppError, ErrorCode } from '../utils/errors';
 import { formatChatContext } from '../services/log-formatter';
 import { buildChatInstructions } from '../services/prompt-builder';
-import { callOpenAIResponses } from '../services/openai';
+import { callOpenAIResponses, callOpenAIResponsesStream } from '../services/openai';
 import { authMiddleware } from '../middleware/auth';
 import { rateLimitMiddleware } from '../middleware/rate-limit';
 
@@ -24,13 +24,32 @@ chat.post(
       throw new AppError(ErrorCode.INVALID_REQUEST, parsed.error.issues[0]?.message);
     }
 
-    const { baby, message, previousResponseId, activityLogs } = parsed.data;
+    const { baby, message, previousResponseId, activityLogs, stream } = parsed.data;
 
     // Format logs to date-grouped Japanese text
     const context = formatChatContext(baby, activityLogs);
 
     // Build instructions and call OpenAI Responses API
     const instructions = buildChatInstructions(context);
+
+    // SSE streaming response
+    if (stream) {
+      const readable = callOpenAIResponsesStream(
+        c.env.OPENAI_API_KEY,
+        instructions,
+        message,
+        previousResponseId,
+      );
+      return new Response(readable, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+        },
+      });
+    }
+
+    // Non-streaming response
     const result = await callOpenAIResponses(
       c.env.OPENAI_API_KEY,
       instructions,
