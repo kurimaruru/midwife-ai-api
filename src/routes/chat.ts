@@ -3,8 +3,8 @@ import type { AppEnv, ChatResponse, ChatRequest } from '../types';
 import { chatRequestSchema } from '../utils/validation';
 import { AppError, ErrorCode } from '../utils/errors';
 import { formatChatContext } from '../services/log-formatter';
-import { buildChatMessages } from '../services/prompt-builder';
-import { callOpenAI } from '../services/openai';
+import { buildChatInstructions } from '../services/prompt-builder';
+import { callOpenAIResponses } from '../services/openai';
 import { authMiddleware } from '../middleware/auth';
 import { rateLimitMiddleware } from '../middleware/rate-limit';
 
@@ -24,20 +24,26 @@ chat.post(
       throw new AppError(ErrorCode.INVALID_REQUEST, parsed.error.issues[0]?.message);
     }
 
-    const { baby, messages: userMessages, activityLogs } = parsed.data;
+    const { baby, message, previousResponseId, activityLogs } = parsed.data;
 
     // Format logs to date-grouped Japanese text
     const context = formatChatContext(baby, activityLogs);
 
-    // Build prompt with conversation history and call OpenAI
-    const messages = buildChatMessages(context, userMessages);
-    const replyText = await callOpenAI(c.env.OPENAI_API_KEY, 'gpt-4o', messages);
+    // Build instructions and call OpenAI Responses API
+    const instructions = buildChatInstructions(context);
+    const result = await callOpenAIResponses(
+      c.env.OPENAI_API_KEY,
+      instructions,
+      message,
+      previousResponseId,
+    );
 
     return c.json<ChatResponse>({
       message: {
         role: 'assistant',
-        content: replyText,
+        content: result.content,
       },
+      responseId: result.responseId,
       generatedAt: new Date().toISOString(),
     });
   },

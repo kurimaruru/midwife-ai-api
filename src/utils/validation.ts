@@ -39,12 +39,6 @@ const activityLogSchema = z.object({
   note: z.string().max(500).optional(),
 });
 
-// --- Message Schema ---
-const messageSchema = z.object({
-  role: z.enum(['user', 'assistant']),
-  content: z.string().min(1).max(2000),
-});
-
 // --- Advice Request Schema ---
 export const adviceRequestSchema = z.object({
   baby: babySchema,
@@ -53,13 +47,12 @@ export const adviceRequestSchema = z.object({
 });
 
 // --- Chat Request Schema ---
-export const chatRequestSchema = z
-  .object({
-    baby: babySchema,
-    messages: z.array(messageSchema).min(1).max(50),
-    activityLogs: z.array(activityLogSchema).max(200),
-  })
-  .refine((data) => data.messages[data.messages.length - 1].role === 'user', {
-    message: '最後のメッセージはユーザーからのものである必要があります',
-    path: ['messages'],
-  });
+export const chatRequestSchema = z.object({
+  baby: babySchema,
+  message: z.string().min(1).max(2000),
+  previousResponseId: z
+    .string()
+    .regex(/^resp_/, 'previousResponseIdは resp_ で始まる必要があります')
+    .optional(),
+  activityLogs: z.array(activityLogSchema).max(200),
+});

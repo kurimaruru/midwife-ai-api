@@ -23,7 +23,16 @@ export function buildAdviceMessages(formattedSummary: string): OpenAIMessage[] {
 }
 
 /**
- * Build messages for the /v1/chat endpoint.
+ * Build instructions string for the /v1/chat endpoint (Responses API).
+ */
+export function buildChatInstructions(formattedContext: string): string {
+  return formattedContext
+    ? `${BASE_SYSTEM_PROMPT}\n\n以下は参考となる育児記録です：\n${formattedContext}`
+    : BASE_SYSTEM_PROMPT;
+}
+
+/**
+ * Build messages for the /v1/chat endpoint (legacy).
  */
 export function buildChatMessages(
   formattedContext: string,

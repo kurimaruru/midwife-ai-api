@@ -244,6 +244,13 @@ type StoreKitPayload = {
 };
 
 export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
+  // 開発環境では認証をスキップ
+  if (c.env.ENVIRONMENT === 'development') {
+    c.set('transactionId', 'dev-user');
+    await next();
+    return;
+  }
+
   const authHeader = c.req.header('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
     throw new AppError(ErrorCode.AUTH_MISSING);

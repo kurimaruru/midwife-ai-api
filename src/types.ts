@@ -9,6 +9,7 @@ export type CloudflareBindings = {
   OPENAI_API_KEY: string;
 
   // Vars
+  ENVIRONMENT: string;
   ALLOWED_BUNDLE_ID: string;
   PREMIUM_PRODUCT_ID: string;
 };
@@ -67,14 +68,10 @@ export type AdviceRequest = {
   activityLogs: ActivityLog[];
 };
 
-export type ChatMessage = {
-  role: 'user' | 'assistant';
-  content: string;
-};
-
 export type ChatRequest = {
   baby: Baby;
-  messages: ChatMessage[];
+  message: string;
+  previousResponseId?: string;
   activityLogs: ActivityLog[];
 };
 
@@ -85,7 +82,8 @@ export type AdviceResponse = {
 };
 
 export type ChatResponse = {
-  message: ChatMessage;
+  message: { role: 'assistant'; content: string };
+  responseId: string;
   generatedAt: string;
 };
 
